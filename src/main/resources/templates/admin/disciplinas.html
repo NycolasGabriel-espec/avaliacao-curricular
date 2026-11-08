@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Disciplinas')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: adminHeader('disciplinas')}"></header>
+<main id="conteudo" class="site-width admin-main">
+    <section class="admin-intro" aria-labelledby="titulo">
+        <div>
+            <p class="eyebrow page-kicker"><span></span> Coordenação</p>
+            <h1 id="titulo">Disciplinas</h1>
+            <p>Gerencie as disciplinas disponíveis para avaliação em cada período letivo.</p>
+        </div>
+    </section>
+
+    <div class="admin-grid">
+        <section class="surface registration-panel" aria-labelledby="cadastro-titulo">
+            <header class="panel-heading">
+                <h2 id="cadastro-titulo">Cadastrar disciplina</h2>
+                <p>Todos os campos são obrigatórios.</p>
+            </header>
+            <form method="post" th:action="@{/admin/disciplinas}" th:object="${disciplinaForm}" class="compact-form">
+                <div th:if="${disciplinaCriada}" class="feedback feedback-success" role="status">Disciplina cadastrada.</div>
+                <section th:replace="~{fragments/layout :: errors}"></section>
+                <div class="field">
+                    <label class="form-label" for="nome">Nome da disciplina</label>
+                    <input class="form-control" type="text" th:field="*{nome}" maxlength="150" required
+                           th:attr="aria-invalid=${#fields.hasErrors('nome') ? 'true' : null},aria-describedby=${#fields.hasErrors('nome') ? 'nome-erro' : null}">
+                    <p class="field-error" id="nome-erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">Revise o nome.</p>
+                </div>
+                <div class="field">
+                    <label class="form-label" for="codigo">Código acadêmico</label>
+                    <input class="form-control" type="text" th:field="*{codigo}" maxlength="30" required spellcheck="false"
+                           th:attr="aria-invalid=${#fields.hasErrors('codigo') ? 'true' : null},aria-describedby=${#fields.hasErrors('codigo') ? 'codigo-erro' : null}">
+                    <p class="field-error" id="codigo-erro" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}">Revise o código.</p>
+                </div>
+                <div class="field">
+                    <label class="form-label" for="semestralidade">Período letivo</label>
+                    <input class="form-control" type="text" th:field="*{semestralidade}" maxlength="6" required
+                           pattern="[0-9]{4}[.][12]" placeholder="2026.1" spellcheck="false"
+                           th:attr="aria-invalid=${#fields.hasErrors('semestralidade') ? 'true' : null},aria-describedby=${#fields.hasErrors('semestralidade') ? 'periodo-dica periodo-erro' : 'periodo-dica'}">
+                    <p class="field-hint" id="periodo-dica">Use o ano seguido de .1 ou .2.</p>
+                    <p class="field-error" id="periodo-erro" th:if="${#fields.hasErrors('semestralidade')}" th:errors="*{semestralidade}">Revise o período letivo.</p>
+                </div>
+                <button class="action-button" type="submit">
+                    <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#plus}"></use></svg>
+                    Cadastrar disciplina
+                </button>
+            </form>
+        </section>
+
+        <section class="surface table-panel" aria-labelledby="disciplinas-titulo">
+            <header class="panel-heading">
+                <h2 id="disciplinas-titulo">Disciplinas cadastradas</h2>
+                <p>As disciplinas desta lista aparecem no formulário dos estudantes.</p>
+            </header>
+            <div class="table-responsive" th:unless="${#lists.isEmpty(disciplinas)}"
+                 role="region" aria-label="Tabela de disciplinas cadastradas" tabindex="0">
+                <table class="table">
+                    <thead>
+                    <tr><th scope="col">Disciplina</th><th scope="col">Código</th><th scope="col">Período</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="disciplina : ${disciplinas}">
+                        <th scope="row" th:text="${disciplina.nome}">Disciplina</th>
+                        <td th:text="${disciplina.codigo}">COD</td>
+                        <td th:text="${disciplina.semestralidade}">2026.1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(disciplinas)}" class="empty-state">
+                <span class="status-icon status-blue" aria-hidden="true"><svg class="icon"><use th:href="@{/images/icones.svg#book}"></use></svg></span>
+                <h3>Nenhuma disciplina cadastrada</h3>
+                <p>Preencha o formulário de cadastro para disponibilizar a primeira disciplina.</p>
+            </div>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Área da coordenação')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: publicHeader(false)}"></header>
+<main id="conteudo" class="site-width centered-main">
+    <section class="surface compact-card login-card" aria-labelledby="titulo">
+        <span class="status-icon status-blue" aria-hidden="true">
+            <svg class="icon"><use th:href="@{/images/icones.svg#lock}"></use></svg>
+        </span>
+        <p class="eyebrow page-kicker">Acesso restrito</p>
+        <h1 id="titulo">Área da coordenação</h1>
+        <p>Entre para consultar os resultados e cadastrar disciplinas.</p>
+
+        <div th:if="${param.error}" class="feedback feedback-error" role="alert">Usuário ou senha inválidos.</div>
+        <div th:if="${param.logout}" class="feedback feedback-info" role="status">Sessão encerrada.</div>
+
+        <form method="post" th:action="@{/admin/entrar}" class="compact-form">
+            <div class="field">
+                <label class="form-label" for="username">Usuário</label>
+                <input class="form-control" type="text" name="username" id="username"
+                       autocomplete="username" autocapitalize="none" spellcheck="false" required>
+            </div>
+            <div class="field">
+                <label class="form-label" for="password">Senha</label>
+                <input class="form-control" type="password" name="password" id="password" autocomplete="current-password" required>
+            </div>
+            <button class="action-button" type="submit">
+                Entrar
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#arrow-right}"></use></svg>
+            </button>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

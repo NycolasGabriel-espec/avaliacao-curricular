@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Avaliação curricular')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: publicHeader(true)}"></header>
+<main id="conteudo" class="site-width public-main">
+    <section class="evaluation-hero" aria-labelledby="titulo">
+        <div class="hero-content">
+            <p class="eyebrow hero-kicker"><span></span> Espaço do estudante</p>
+            <h1 id="titulo">Avaliação curricular</h1>
+            <p class="hero-description">Compartilhe sua experiência em uma disciplina e ajude a melhorar o ensino para as próximas turmas.</p>
+            <p class="hero-meta">
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#clock}"></use></svg>
+                Cerca de 2 minutos
+            </p>
+        </div>
+        <img class="hero-art" th:src="@{/images/escuta.svg}" width="530" height="330" alt="">
+    </section>
+
+    <div class="evaluation-grid">
+        <form class="surface evaluation-form" method="post" th:action="@{/avaliacoes/salvar}"
+              th:object="${avaliacao}" data-evaluation-form>
+            <div class="error-inset" th:if="${#fields.hasAnyErrors()}">
+                <section th:replace="~{fragments/layout :: errors}"></section>
+            </div>
+
+            <section class="form-section" aria-labelledby="disciplina-titulo">
+                <div class="section-heading">
+                    <span class="step-number" aria-hidden="true">01</span>
+                    <div>
+                        <h2 id="disciplina-titulo">Disciplina</h2>
+                        <p>Selecione a disciplina e o período que deseja avaliar.</p>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(disciplinas)}" class="feedback feedback-info">
+                    <strong>Nenhuma disciplina disponível</strong>
+                    <p>Aguarde o cadastro de disciplinas pela coordenação.</p>
+                </div>
+                <div th:unless="${#lists.isEmpty(disciplinas)}" class="field">
+                    <label class="form-label" for="disciplinaId">Disciplina e período <span class="required-mark" aria-hidden="true">*</span></label>
+                    <select class="form-select" th:field="*{disciplinaId}" required
+                            th:attr="aria-invalid=${#fields.hasErrors('disciplinaId') ? 'true' : null},aria-describedby=${#fields.hasErrors('disciplinaId') ? 'disciplina-erro' : null}">
+                        <option value="">Selecione uma disciplina</option>
+                        <option th:each="disciplina : ${disciplinas}" th:value="${disciplina.id}"
+                                th:text="|${disciplina.nome} · ${disciplina.codigo} · ${disciplina.semestralidade}|">Disciplina</option>
+                    </select>
+                    <p id="disciplina-erro" class="field-error" th:if="${#fields.hasErrors('disciplinaId')}" th:errors="*{disciplinaId}">Selecione uma disciplina.</p>
+                </div>
+            </section>
+
+            <th:block th:unless="${#lists.isEmpty(disciplinas)}">
+                <section class="form-section" aria-labelledby="criterios-titulo">
+                    <div class="section-heading">
+                        <span class="step-number" aria-hidden="true">02</span>
+                        <div>
+                            <h2 id="criterios-titulo">Critérios de avaliação</h2>
+                            <p>Escolha uma nota de 1 a 5 para cada critério. As quatro notas são obrigatórias.</p>
+                        </div>
+                    </div>
+                    <div class="rating-scale" aria-hidden="true">
+                        <span><strong>1</strong> Menor nota</span>
+                        <span><strong>5</strong> Maior nota</span>
+                    </div>
+                    <fieldset th:replace="~{fragments/criterio :: nota('clarezaEmenta', 'Clareza da ementa', 'O conteúdo da disciplina foi apresentado com clareza.')}"></fieldset>
+                    <fieldset th:replace="~{fragments/criterio :: nota('relevanciaConteudo', 'Relevância do conteúdo', 'Os conteúdos contribuíram para a sua formação.')}"></fieldset>
+                    <fieldset th:replace="~{fragments/criterio :: nota('cargaHorariaAdequada', 'Adequação da carga horária', 'A carga horária foi compatível com o conteúdo da disciplina.')}"></fieldset>
+                    <fieldset th:replace="~{fragments/criterio :: nota('cumprimentoObjetivos', 'Cumprimento dos objetivos', 'A disciplina atingiu os objetivos apresentados.')}"></fieldset>
+                </section>
+
+                <section class="form-section" aria-labelledby="sugestoes-titulo">
+                    <div class="section-heading">
+                        <span class="step-number" aria-hidden="true">03</span>
+                        <div>
+                            <h2 id="sugestoes-titulo">Sugestões de melhoria</h2>
+                            <p>O que poderia melhorar nesta disciplina?</p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="form-label" for="sugestoesMelhoria">Sua sugestão <span class="optional-tag">Opcional</span></label>
+                        <textarea class="form-control" rows="4" maxlength="2000" th:field="*{sugestoesMelhoria}"
+                                  th:attr="aria-invalid=${#fields.hasErrors('sugestoesMelhoria') ? 'true' : null},aria-describedby=${#fields.hasErrors('sugestoesMelhoria') ? 'sugestoes-dica sugestoes-erro' : 'sugestoes-dica'}"
+                                  placeholder="Por exemplo, que tal incluir mais exercícios práticos?"></textarea>
+                        <p id="sugestoes-dica" class="field-hint">Até 2.000 caracteres. Evite incluir nomes, matrículas ou outros dados pessoais.</p>
+                        <p id="sugestoes-erro" class="field-error" th:if="${#fields.hasErrors('sugestoesMelhoria')}" th:errors="*{sugestoesMelhoria}">Revise a sugestão.</p>
+                    </div>
+                </section>
+
+                <div class="form-actions">
+                    <span><span class="required-mark" aria-hidden="true">*</span> Campo obrigatório</span>
+                    <button class="action-button" type="submit">
+                        Enviar avaliação
+                        <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#arrow-right}"></use></svg>
+                    </button>
+                </div>
+            </th:block>
+        </form>
+
+        <aside class="evaluation-aside" aria-label="Orientações de preenchimento">
+            <section class="surface guide-card">
+                <h2>Como funciona</h2>
+                <ol class="guide-list">
+                    <li><span aria-hidden="true">1</span> Escolha a disciplina</li>
+                    <li><span aria-hidden="true">2</span> Atribua as quatro notas</li>
+                    <li><span aria-hidden="true">3</span> Envie sua avaliação</li>
+                </ol>
+                <div class="form-progress" data-evaluation-progress hidden>
+                    <label for="progresso">Progresso <span data-progress-label>0 de 5 campos</span></label>
+                    <progress id="progresso" value="0" max="5"></progress>
+                </div>
+            </section>
+            <section class="privacy-note">
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#shield}"></use></svg>
+                <div>
+                    <h2>Sem identificação</h2>
+                    <p>O formulário dispensa login e não solicita seus dados pessoais.</p>
+                </div>
+            </section>
+        </aside>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

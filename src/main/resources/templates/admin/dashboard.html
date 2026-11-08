@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Painel de avaliação')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: adminHeader('painel')}"></header>
+<main id="conteudo" class="site-width admin-main">
+    <section class="admin-intro" aria-labelledby="titulo">
+        <div>
+            <p class="eyebrow page-kicker"><span></span> Coordenação</p>
+            <h1 id="titulo">Painel de avaliação</h1>
+            <p>Acompanhe a participação e compare as médias das disciplinas.</p>
+        </div>
+        <form class="filter-form" method="get" th:action="@{/admin/dashboard}">
+            <label class="form-label" for="periodo">Período letivo</label>
+            <div class="filter-controls">
+                <select id="periodo" class="form-select" name="periodo">
+                    <option value="">Todos os períodos</option>
+                    <option th:each="opcao : ${periodos}" th:value="${opcao}"
+                            th:text="${opcao}" th:selected="${opcao == periodo}">2026.1</option>
+                </select>
+                <button type="submit" class="secondary-button">Filtrar</button>
+            </div>
+        </form>
+    </section>
+
+    <dl class="summary-grid" aria-label="Resumo do período">
+        <div class="surface summary-card">
+            <dt>
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#file}"></use></svg>
+                Avaliações recebidas
+            </dt>
+            <dd th:text="${totalAvaliacoes}">0</dd>
+        </div>
+        <div class="surface summary-card">
+            <dt>
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#bars}"></use></svg>
+                Disciplinas avaliadas
+            </dt>
+            <dd th:text="${disciplinasAvaliadas}">0</dd>
+        </div>
+        <div class="surface summary-card">
+            <dt>
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#book}"></use></svg>
+                Disciplinas no período
+            </dt>
+            <dd th:text="${totalDisciplinas}">0</dd>
+        </div>
+    </dl>
+
+    <section class="surface chart-panel" th:if="${totalAvaliacoes > 0}" data-chart-panel hidden aria-labelledby="grafico-titulo">
+        <header class="panel-heading chart-heading">
+            <div>
+                <h2 id="grafico-titulo">Comparativo por disciplina</h2>
+                <p>Médias de 1 a 5 para cada critério avaliado.</p>
+            </div>
+            <div class="chart-pagination" data-chart-pagination hidden>
+                <button type="button" class="secondary-button icon-button" data-chart-prev aria-label="Disciplinas anteriores">
+                    <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#arrow-left}"></use></svg>
+                </button>
+                <span data-chart-range aria-live="polite"></span>
+                <button type="button" class="secondary-button icon-button" data-chart-next aria-label="Próximas disciplinas">
+                    <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#arrow-right}"></use></svg>
+                </button>
+            </div>
+        </header>
+        <ul class="chart-legend" aria-label="Legenda dos critérios">
+            <li><span class="chart-key key-ementa"></span> Clareza da ementa</li>
+            <li><span class="chart-key key-relevancia"></span> Relevância do conteúdo</li>
+            <li><span class="chart-key key-carga"></span> Adequação da carga horária</li>
+            <li><span class="chart-key key-objetivos"></span> Cumprimento dos objetivos</li>
+        </ul>
+        <div class="chart-scroll">
+            <div class="chart-canvas">
+                <canvas id="comparativo" aria-hidden="true"></canvas>
+            </div>
+        </div>
+        <a class="text-link chart-link" href="#medias-titulo">Consultar os valores na tabela</a>
+    </section>
+
+    <section class="surface table-panel" aria-labelledby="medias-titulo">
+        <header class="panel-heading">
+            <h2 id="medias-titulo" tabindex="-1">Médias por critério</h2>
+            <p>As médias consideram apenas as avaliações recebidas para cada disciplina e período.</p>
+        </header>
+
+        <div class="table-responsive results-table" th:unless="${#lists.isEmpty(indicadores)}"
+             role="region" aria-label="Tabela de médias das disciplinas" tabindex="0">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Disciplina</th>
+                    <th scope="col">Período</th>
+                    <th scope="col">Respostas</th>
+                    <th scope="col">Clareza da ementa</th>
+                    <th scope="col">Relevância do conteúdo</th>
+                    <th scope="col">Adequação da carga horária</th>
+                    <th scope="col">Cumprimento dos objetivos</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${indicadores}"
+                    th:attr="data-disciplina=${item.total() > 0 ? item.nome() : null},data-codigo=${item.codigo()},
+                             data-periodo=${item.semestralidade()},data-ementa=${item.clarezaEmenta()},
+                             data-relevancia=${item.relevanciaConteudo()},data-carga=${item.cargaHorariaAdequada()},
+                             data-objetivos=${item.cumprimentoObjetivos()}">
+                    <th scope="row">
+                        <strong th:text="${item.nome()}">Disciplina</strong>
+                        <span class="table-code" th:text="${item.codigo()}">COD</span>
+                    </th>
+                    <td th:text="${item.semestralidade()}">2026.1</td>
+                    <td th:text="${item.total()}">0</td>
+                    <td th:text="${item.clarezaEmenta() == null ? '—' : #numbers.formatDecimal(item.clarezaEmenta(), 1, 2, 'COMMA')}">—</td>
+                    <td th:text="${item.relevanciaConteudo() == null ? '—' : #numbers.formatDecimal(item.relevanciaConteudo(), 1, 2, 'COMMA')}">—</td>
+                    <td th:text="${item.cargaHorariaAdequada() == null ? '—' : #numbers.formatDecimal(item.cargaHorariaAdequada(), 1, 2, 'COMMA')}">—</td>
+                    <td th:text="${item.cumprimentoObjetivos() == null ? '—' : #numbers.formatDecimal(item.cumprimentoObjetivos(), 1, 2, 'COMMA')}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(indicadores)}" class="empty-state">
+            <span class="status-icon status-blue" aria-hidden="true"><svg class="icon"><use th:href="@{/images/icones.svg#book}"></use></svg></span>
+            <h3>Nenhuma disciplina neste período</h3>
+            <p>Selecione outro período ou cadastre uma disciplina para começar.</p>
+            <a class="secondary-button" th:href="@{/admin/disciplinas}">Gerenciar disciplinas</a>
+        </div>
+        <p class="table-note" th:unless="${#lists.isEmpty(indicadores)}">O símbolo “—” indica que a disciplina ainda não recebeu avaliações.</p>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script defer th:if="${totalAvaliacoes > 0}" th:src="@{/webjars/chart.js/4.5.1/dist/chart.umd.js}"></script>
+<script defer th:if="${totalAvaliacoes > 0}" th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

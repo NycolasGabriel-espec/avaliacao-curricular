@@ -1,0 +1,15 @@
+<fieldset xmlns:th="http://www.thymeleaf.org" th:fragment="nota(campo, titulo, descricao)"
+          class="rating-row" th:id="${campo}" tabindex="-1"
+          th:with="invalido=${#fields.hasErrors(campo)}"
+          th:attr="aria-describedby=${campo + '-descricao' + (invalido ? ' ' + campo + '-erro' : '')}">
+    <legend th:text="${titulo}">Critério</legend>
+    <p class="rating-description" th:id="|${campo}-descricao|" th:text="${descricao}">Descrição do critério.</p>
+    <div class="rating-options">
+        <label class="rating-option" th:each="nota : ${#numbers.sequence(1,5)}">
+            <input class="visually-hidden" type="radio" th:field="*{__${campo}__}" th:value="${nota}" required
+                   th:attr="aria-invalid=${invalido ? 'true' : null}">
+            <span th:text="${nota}">1</span>
+        </label>
+    </div>
+    <p th:if="${invalido}" th:id="|${campo}-erro|" class="field-error" th:errors="*{__${campo}__}">Nota inválida.</p>
+</fieldset>

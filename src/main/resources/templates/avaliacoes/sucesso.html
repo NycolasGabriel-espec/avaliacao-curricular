@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Avaliação enviada')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: publicHeader(true)}"></header>
+<main id="conteudo" class="site-width centered-main">
+    <section class="surface compact-card success-card" aria-labelledby="titulo">
+        <span class="status-icon" aria-hidden="true">
+            <svg class="icon"><use th:href="@{/images/icones.svg#check}"></use></svg>
+        </span>
+        <p class="eyebrow page-kicker">Envio concluído</p>
+        <h1 id="titulo">Avaliação enviada!</h1>
+        <p>Sua resposta foi registrada. Obrigado por contribuir para a melhoria do ensino.</p>
+        <a class="action-button" th:href="@{/avaliacoes/nova}">
+            Avaliar outra disciplina
+            <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#arrow-right}"></use></svg>
+        </a>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

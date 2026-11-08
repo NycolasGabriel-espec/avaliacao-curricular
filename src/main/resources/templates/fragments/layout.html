@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+    <title th:text="|${titulo} · Avalia|">Avalia</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/marca.svg}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/avalia.css}">
+    <script defer th:src="@{/js/interface.js}"></script>
+</head>
+<body>
+<a th:fragment="skip" class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+<a th:fragment="marca(destino)" class="brand" th:href="${destino}" aria-label="Avalia · Escuta acadêmica">
+    <img th:src="@{/images/marca.svg}" width="40" height="40" alt="">
+    <span class="brand-name">Avalia <span>Escuta acadêmica</span></span>
+</a>
+
+<header th:fragment="publicHeader(entrada)" class="site-header">
+    <a th:replace="~{fragments/layout :: skip}"></a>
+    <div class="site-width header-inner">
+        <a th:replace="~{fragments/layout :: marca(@{/avaliacoes/nova})}"></a>
+        <a th:if="${entrada}" class="header-link" th:href="@{/admin/entrar}">
+            <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#lock}"></use></svg>
+            <span>Área da coordenação</span>
+        </a>
+        <a th:unless="${entrada}" class="header-link" th:href="@{/avaliacoes/nova}">
+            <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#arrow-left}"></use></svg>
+            <span>Voltar à avaliação</span>
+        </a>
+    </div>
+</header>
+
+<header th:fragment="adminHeader(secao)" class="site-header">
+    <a th:replace="~{fragments/layout :: skip}"></a>
+    <div class="site-width header-inner admin-header-inner">
+        <a th:replace="~{fragments/layout :: marca(@{/admin/dashboard})}"></a>
+        <nav class="admin-nav" aria-label="Coordenação">
+            <a th:href="@{/admin/dashboard}" th:attr="aria-current=${secao == 'painel' ? 'page' : null}">Painel</a>
+            <a th:href="@{/admin/disciplinas}" th:attr="aria-current=${secao == 'disciplinas' ? 'page' : null}">Disciplinas</a>
+        </nav>
+        <form class="logout-form" method="post" th:action="@{/admin/sair}">
+            <button class="header-link" type="submit">
+                <svg class="icon" aria-hidden="true"><use th:href="@{/images/icones.svg#logout}"></use></svg>
+                Sair
+            </button>
+        </form>
+    </div>
+</header>
+
+<footer th:fragment="footer" class="site-footer">
+    <div class="site-width footer-inner">
+        <span><strong>Avalia</strong> <span class="footer-dot" aria-hidden="true">·</span> Escuta acadêmica</span>
+        <span>Processo de avaliação curricular</span>
+    </div>
+</footer>
+
+<section th:fragment="errors" th:if="${#fields.hasAnyErrors()}" class="feedback feedback-error"
+         tabindex="-1" data-focus-errors aria-labelledby="erros-titulo">
+    <h2 id="erros-titulo">Confira os campos indicados</h2>
+    <ul>
+        <li th:each="erro : ${#fields.detailedErrors()}">
+            <a th:unless="${erro.global}" th:href="|#${erro.fieldName}|" th:text="${erro.message}">Mensagem</a>
+            <span th:if="${erro.global}" th:text="${erro.message}">Mensagem</span>
+        </li>
+    </ul>
+</section>
+</body>
+</html>
